@@ -1,9 +1,9 @@
-export const startAction = () => {
+const generateOperands = () => {
   return {
-    type: 'START_GAME',
+    type: 'GENERATE_OPERANDS',
     operands: [Math.floor(Math.random() * 1000),
       Math.floor(Math.random() * 1000)]
   };
 };
 
-export default startAction;
+export default generateOperands;
