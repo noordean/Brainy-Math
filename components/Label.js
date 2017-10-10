@@ -4,7 +4,7 @@ import { Text } from 'react-native-elements';
 
 
 const Label = props => (
-  <View style={props.style}>
+  <View>
     <Text h3>{props.labelText}</Text>
   </View>
 );

@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import startReducer from './startReducer';
+import generateOperands from './generateOperands';
+import generateOptions from './generateOptions';
 
 export default combineReducers({
-  operands: startReducer
+  operands: generateOperands,
+  options: generateOptions
 });

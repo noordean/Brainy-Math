@@ -4,7 +4,7 @@ import { Button } from 'react-native-elements';
 
 
 const ButtonElement = props => (
-  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+  <View>
     <Button
       title={props.buttonText}
       onPress={props.onPress}

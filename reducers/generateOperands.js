@@ -1,12 +1,12 @@
 const initialState = [];
 
-const startReducer = (state = initialState, action) => {
+const generateOperands = (state = initialState, action) => {
   switch (action.type) {
-    case 'START_GAME':
+    case 'GENERATE_OPERANDS':
       return [...action.operands];
     default:
       return state;
   }
 };
 
-export default startReducer;
+export default generateOperands;
