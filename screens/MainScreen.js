@@ -15,6 +15,8 @@ import generateOptions from '../actions/generateOptions';
 const STATUS_BAR_HEIGHT = Constants.statusBarHeight;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
+let playTimerId = null;
+let runTimerId = null;
 class MainScreen extends Component {
   constructor(props) {
     super(props);
@@ -23,9 +25,12 @@ class MainScreen extends Component {
       options: ['A', 'B', 'C', 'D'],
       operands: [0, 0],
       questionCount: 0,
-      score: 0
+      totalQuestion: 10,
+      score: 0,
+      time: 5,
+      gameOver: true
     }
-    this.startGame = this.startGame.bind(this);
+    this.playGame = this.playGame.bind(this);
     this.chooseAnswer = this.chooseAnswer.bind(this);
   }
   static navigationOptions = {
@@ -68,6 +73,7 @@ class MainScreen extends Component {
   shuffleOptions(options) {
     return options.sort(() => Math.random() - 0.5);
   }
+
   startGame() {
     this.props.generateOperands();
     setTimeout(() => {
@@ -75,14 +81,105 @@ class MainScreen extends Component {
     }, 0);
   }
 
+  resetGame() {
+    this.setState({
+      selectedIndex: 1,
+      options: ['A', 'B', 'C', 'D'],
+      operands: [0, 0],
+      questionCount: 0,
+      score: 0,
+      time: 5,
+      gameOver: true
+    });
+    clearInterval(playTimerId);
+    clearInterval(runTimerId);
+  }
+
   chooseAnswer(selectedIndex) {
-    const options = this.state.options;
-    const operands = this.state.operands;
-    if (options[selectedIndex] === operands[0] + operands[1]) {
-      Alert.alert('correct');
-    } else {
-      Alert.alert('not correct');
+    const {
+      options,
+      operands,
+      totalQuestion,
+      gameOver,
+      questionCount,
+      score
+    } = this.state;
+    if (gameOver === false && questionCount === totalQuestion) {
+      this.resetGame();
+      return Alert.alert('Game Over', `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
     }
+    if (options[selectedIndex] === operands[0] + operands[1]) {
+      this.setState({
+        score: score + 1
+      });
+    }
+    this.startGame();
+    this.setState({
+      questionCount: questionCount + 1,
+      time: 5
+    });
+  }
+
+  componentWillUpdate() {
+    const { questionCount, totalQuestion, time, score } = this.state;
+    if (questionCount === (totalQuestion + 1) && time === 0) {
+      this.resetGame();
+      Alert.alert('Game Over', `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
+    }
+  }
+  
+  playGame() {
+    this.runTimer()
+    this.startGame();
+    this.setState({
+      gameOver: false,
+      questionCount: 1
+    });
+    playTimerId = setInterval(() => {
+      if (this.state.time === 0 && this.state.gameOver === false) {
+        this.startGame();
+        this.setState({
+          questionCount: this.state.questionCount + 1
+        });
+      }
+    }, 1000);
+  }
+  
+  runTimer() {
+    runTimerId = setInterval(() => {
+      if (this.state.gameOver === false) {
+        if (this.state.time === 0) {
+          this.setState({
+            time: 5
+          });
+        } else {
+          this.setState({
+            time: this.state.time - 1
+          });
+        }
+      }
+    }, 1000);
+  }
+
+  renderStartBtn() {
+    if (this.state.gameOver) {
+      return (<ButtonElement
+                buttonText={'Start'}
+                onPress={this.playGame}
+              />);
+    }
+    return null;
+  }
+
+  renderOptionBtns() {
+    if (!this.state.gameOver) {
+      return (<Options
+                selectedIndex={this.state.selectedIndex}
+                optionList={this.state.options}
+                onPress={this.chooseAnswer}
+              />);
+    }
+    return null;
   }
 
   render() {
@@ -96,9 +193,9 @@ class MainScreen extends Component {
           marginLeft: 10,
           width: SCREEN_WIDTH * 0.9 }}
         >
-          <Text h6>Question: 1</Text>
-          <Text h6>Timer: 0</Text>
-          <Text h6>Score: 0</Text>
+          <Text h6>Question: {this.state.questionCount}</Text>
+          <Text h6>Timer: {this.state.time}s</Text>
+          <Text h6>Score: {this.state.score}</Text>
         </View>
         <View style={{
           flex: 6,
@@ -113,15 +210,8 @@ class MainScreen extends Component {
           <Label
             labelText={this.state.operands[1]}
           />
-          <ButtonElement
-            buttonText={'Start'}
-            onPress={this.startGame}
-          />
-          <Options
-            selectedIndex={this.state.selectedIndex}
-            optionList={this.state.options}
-            onPress={this.chooseAnswer}
-          />
+          {this.renderStartBtn()}
+          {this.renderOptionBtns()}
         </View>
       </View>
 
