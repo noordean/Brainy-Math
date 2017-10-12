@@ -1,7 +1,7 @@
 # BrainyMath
 A simple mathematical game that tests user's knowledge of simple addition. It's fun and at the same time educative.
 
-![image](https://user-images.githubusercontent.com/14357823/31495080-162f874c-af4e-11e7-8870-8b102c5bad53.png) ![image](https://user-images.githubusercontent.com/14357823/31495102-28e9fd72-af4e-11e7-9ed0-388ab1816031.png) ![image](https://user-images.githubusercontent.com/14357823/31495124-391017cc-af4e-11e7-98ad-4c029291a2cd.png)
+![image](https://user-images.githubusercontent.com/14357823/31495326-19146c92-af4f-11e7-939d-aeb11285ba96.png) ![image](https://user-images.githubusercontent.com/14357823/31495337-29eb0242-af4f-11e7-9e9c-ed384cf246c9.png) ![image](https://user-images.githubusercontent.com/14357823/31495356-39b621ac-af4f-11e7-8baa-f3c7ebba47b0.png)
 
 ## Development
 The application was developed to demonstrate the fundamentals of react-native, with redux for managing application state.
