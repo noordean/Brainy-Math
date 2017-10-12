@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Dimensions } from 'react-native';
 import { ButtonGroup } from 'react-native-elements';
+import PropTypes from 'prop-types';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const Options = props => (
@@ -16,5 +17,10 @@ const Options = props => (
   </View>
 );
 
+Options.propTypes = {
+  selectedIndex: PropTypes.number.isRequired,
+  optionList: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onPress: PropTypes.func.isRequired
+};
 export default Options;
 

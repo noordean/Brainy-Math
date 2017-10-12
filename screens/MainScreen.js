@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Text } from 'react-native-elements';
 import { StyleSheet, View, Platform, Image, Alert, Dimensions } from 'react-native';
 import { Constants } from 'expo';
+import PropTypes from 'prop-types';
 
 import Label from '../components/Label';
 import ButtonElement from '../components/ButtonElement';
@@ -17,12 +18,19 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 
 let playTimerId = null;
 let runTimerId = null;
+/**
+  * @class MainScreen
+  */
 class MainScreen extends Component {
+/**
+  * @constructor
+  * @param {Object} props
+  */
   constructor(props) {
     super(props);
     this.state = {
       selectedIndex: 1,
-      options: ['A', 'B', 'C', 'D'],
+      options: [0, 0, 0, 0],
       operands: [0, 0],
       questionCount: 0,
       totalQuestion: 10,
@@ -49,13 +57,20 @@ class MainScreen extends Component {
         style= {{
           marginTop: 20,
           marginLeft: 20,
-          height: 40,
-          width: 40
+          height: 45,
+          width: 45
         }}
       />
     )
   };
 
+  /**
+  * description: executes when the state changes
+  *
+  * @param {Object} nextProps the next state
+  *
+  * @return {Void} void
+  */
   componentWillReceiveProps(nextProps) {
     if (this.props !== nextProps) {
       this.setState({
@@ -64,16 +79,35 @@ class MainScreen extends Component {
       });
     }
   }
-  
+
+  /**
+  * description: calls the generateOptions action
+  * creator
+  *
+  * @return {Void} void
+  */
   getOptions() {
     const answer = this.state.operands[0] + this.state.operands[1];
     this.props.generateOptions(answer);
   }
-  
+
+  /**
+  * description: shuffles the options from from props
+  *
+  * @param {Array} options array of options from props
+  *
+  * @return {Array} sorted options
+  */
   shuffleOptions(options) {
     return options.sort(() => Math.random() - 0.5);
   }
 
+  /**
+  * description: gets operands and options ready for 
+  * a round of game 
+  *
+  * @return {Void} void
+  */
   startGame() {
     this.props.generateOperands();
     setTimeout(() => {
@@ -81,10 +115,15 @@ class MainScreen extends Component {
     }, 0);
   }
 
+  /**
+  * description: resets state to initil values
+  *
+  * @return {Void} void
+  */
   resetGame() {
     this.setState({
       selectedIndex: 1,
-      options: ['A', 'B', 'C', 'D'],
+      options: [0, 0, 0, 0],
       operands: [0, 0],
       questionCount: 0,
       score: 0,
@@ -95,6 +134,14 @@ class MainScreen extends Component {
     clearInterval(runTimerId);
   }
 
+  /**
+  * description: gets called when an option is clicked
+  *
+  * @param {Number} selectedIndex: index of the button clicked
+  * in the ButtonGroup element
+  * 
+  * @return {Void} void
+  */
   chooseAnswer(selectedIndex) {
     const {
       options,
@@ -106,7 +153,8 @@ class MainScreen extends Component {
     } = this.state;
     if (gameOver === false && questionCount === totalQuestion) {
       this.resetGame();
-      return Alert.alert('Game Over', `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
+      return Alert.alert('Game Over',
+      `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
     }
     if (options[selectedIndex] === operands[0] + operands[1]) {
       this.setState({
@@ -120,14 +168,27 @@ class MainScreen extends Component {
     });
   }
 
+  /**
+  * description: executes when the state is about
+  * to get updated
+  *
+  * @return {Void} void
+  */
   componentWillUpdate() {
     const { questionCount, totalQuestion, time, score } = this.state;
     if (questionCount === (totalQuestion + 1) && time === 0) {
       this.resetGame();
-      Alert.alert('Game Over', `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
+      Alert.alert('Game Over',
+      `Score: ${Math.floor((score + 1)/totalQuestion * 100)}%`);
     }
   }
-  
+
+  /**
+  * description: start game process by calling timer,
+  * startGame and increment question number
+  *
+  * @return {Void} void
+  */
   playGame() {
     this.runTimer()
     this.startGame();
@@ -144,7 +205,12 @@ class MainScreen extends Component {
       }
     }, 1000);
   }
-  
+
+  /**
+  * description: runs timer
+  *
+  * @return {Void} void
+  */
   runTimer() {
     runTimerId = setInterval(() => {
       if (this.state.gameOver === false) {
@@ -161,6 +227,12 @@ class MainScreen extends Component {
     }, 1000);
   }
 
+  /**
+  * description: renders start button only if
+  * game is not in progress
+  *
+  * @return {Object} Start button component
+  */
   renderStartBtn() {
     if (this.state.gameOver) {
       return (<ButtonElement
@@ -171,6 +243,12 @@ class MainScreen extends Component {
     return null;
   }
 
+  /**
+  * description: renders Options ButtonGroup
+  * only if game is in progress
+  *
+  * @return {Object} component
+  */
   renderOptionBtns() {
     if (!this.state.gameOver) {
       return (<Options
@@ -182,6 +260,11 @@ class MainScreen extends Component {
     return null;
   }
 
+  /**
+  * description: renders the component
+  *
+  * @return {Object} MainScreen component
+  */
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -219,14 +302,12 @@ class MainScreen extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ddd',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-});
+MainScreen.propTypes = {
+  generateOperands: PropTypes.func.isRequired,
+  generateOptions: PropTypes.func.isRequired,
+  operands: PropTypes.arrayOf(PropTypes.number).isRequired,
+  options: PropTypes.arrayOf(PropTypes.number).isRequired,
+};
 
 const mapStateToProps = state => ({
   operands: state.operands,
